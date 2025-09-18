@@ -28,9 +28,9 @@ async function initializeTools() {
     return;
   }
 
-  // Complete GoHighLevel API tool definitions
+  // Essential GoHighLevel API tools (128 max limit for MCP)
   TOOLS = [
-    // Contact Management Tools
+    // Contact Management Tools (20 tools)
     { name: "search_contacts", description: "Search for contacts in GoHighLevel" },
     { name: "create_contact", description: "Create a new contact in GoHighLevel" },
     { name: "get_contact", description: "Get a specific contact by ID" },
@@ -52,7 +52,7 @@ async function initializeTools() {
     { name: "get_contact_appointments", description: "Get appointments for a contact" },
     { name: "get_contact_timeline", description: "Get timeline events for a contact" },
 
-    // Conversation Tools
+    // Conversation Tools (8 tools)
     { name: "get_conversations", description: "Get conversations" },
     { name: "get_conversation", description: "Get a specific conversation" },
     { name: "send_message", description: "Send a message in a conversation" },
@@ -62,7 +62,7 @@ async function initializeTools() {
     { name: "add_conversation_note", description: "Add note to conversation" },
     { name: "get_conversation_notes", description: "Get notes for conversation" },
 
-    // Opportunity Tools
+    // Opportunity Tools (11 tools)
     { name: "get_opportunities", description: "Get opportunities" },
     { name: "create_opportunity", description: "Create a new opportunity" },
     { name: "get_opportunity", description: "Get a specific opportunity" },
@@ -75,7 +75,7 @@ async function initializeTools() {
     { name: "get_opportunity_tasks", description: "Get tasks for opportunity" },
     { name: "create_opportunity_task", description: "Create task for opportunity" },
 
-    // Calendar Tools
+    // Calendar & Appointment Tools (13 tools)
     { name: "get_calendars", description: "Get calendars" },
     { name: "get_calendar", description: "Get a specific calendar" },
     { name: "create_calendar", description: "Create a new calendar" },
@@ -90,18 +90,7 @@ async function initializeTools() {
     { name: "block_calendar_slot", description: "Block a calendar time slot" },
     { name: "unblock_calendar_slot", description: "Unblock a calendar time slot" },
 
-    // Location Tools
-    { name: "get_locations", description: "Get all locations" },
-    { name: "get_location", description: "Get a specific location" },
-    { name: "create_location", description: "Create a new location" },
-    { name: "update_location", description: "Update a location" },
-    { name: "delete_location", description: "Delete a location" },
-    { name: "get_location_customfields", description: "Get custom fields for location" },
-    { name: "create_location_customfield", description: "Create custom field for location" },
-    { name: "update_location_customfield", description: "Update location custom field" },
-    { name: "delete_location_customfield", description: "Delete location custom field" },
-
-    // Workflow Tools
+    // Workflow Tools (7 tools)
     { name: "get_workflows", description: "Get all workflows" },
     { name: "get_workflow", description: "Get a specific workflow" },
     { name: "create_workflow", description: "Create a new workflow" },
@@ -110,7 +99,7 @@ async function initializeTools() {
     { name: "trigger_workflow", description: "Trigger a workflow for a contact" },
     { name: "remove_contact_from_workflow", description: "Remove contact from workflow" },
 
-    // Email Tools
+    // Email Tools (10 tools)
     { name: "send_email", description: "Send an email" },
     { name: "get_email_templates", description: "Get email templates" },
     { name: "create_email_template", description: "Create email template" },
@@ -122,48 +111,14 @@ async function initializeTools() {
     { name: "update_email_campaign", description: "Update email campaign" },
     { name: "delete_email_campaign", description: "Delete email campaign" },
 
-    // Social Media Tools
-    { name: "get_social_media_accounts", description: "Get social media accounts" },
-    { name: "connect_social_account", description: "Connect social media account" },
-    { name: "disconnect_social_account", description: "Disconnect social media account" },
-    { name: "post_to_social", description: "Post to social media" },
-    { name: "schedule_social_post", description: "Schedule social media post" },
-    { name: "get_social_posts", description: "Get social media posts" },
-    { name: "delete_social_post", description: "Delete social media post" },
+    // SMS Tools (5 tools)
+    { name: "send_sms", description: "Send SMS message" },
+    { name: "get_sms_templates", description: "Get SMS templates" },
+    { name: "create_sms_template", description: "Create SMS template" },
+    { name: "update_sms_template", description: "Update SMS template" },
+    { name: "delete_sms_template", description: "Delete SMS template" },
 
-    // Media Tools
-    { name: "upload_media", description: "Upload media file" },
-    { name: "get_media", description: "Get media files" },
-    { name: "delete_media", description: "Delete media file" },
-    { name: "get_media_by_id", description: "Get specific media file" },
-    { name: "update_media", description: "Update media file" },
-
-    // Blog Tools
-    { name: "get_blogs", description: "Get blog posts" },
-    { name: "create_blog", description: "Create a new blog post" },
-    { name: "get_blog", description: "Get a specific blog post" },
-    { name: "update_blog", description: "Update a blog post" },
-    { name: "delete_blog", description: "Delete a blog post" },
-    { name: "publish_blog", description: "Publish a blog post" },
-    { name: "unpublish_blog", description: "Unpublish a blog post" },
-
-    // Survey Tools
-    { name: "get_surveys", description: "Get surveys" },
-    { name: "create_survey", description: "Create a new survey" },
-    { name: "get_survey", description: "Get a specific survey" },
-    { name: "update_survey", description: "Update a survey" },
-    { name: "delete_survey", description: "Delete a survey" },
-    { name: "get_survey_responses", description: "Get survey responses" },
-    { name: "submit_survey_response", description: "Submit survey response" },
-
-    // Custom Fields Tools
-    { name: "get_custom_fields", description: "Get custom fields" },
-    { name: "create_custom_field", description: "Create a custom field" },
-    { name: "get_custom_field", description: "Get a specific custom field" },
-    { name: "update_custom_field", description: "Update a custom field" },
-    { name: "delete_custom_field", description: "Delete a custom field" },
-
-    // Pipeline Tools
+    // Pipeline Tools (9 tools)
     { name: "get_pipelines", description: "Get sales pipelines" },
     { name: "create_pipeline", description: "Create a new pipeline" },
     { name: "get_pipeline", description: "Get a specific pipeline" },
@@ -174,95 +129,60 @@ async function initializeTools() {
     { name: "update_pipeline_stage", description: "Update pipeline stage" },
     { name: "delete_pipeline_stage", description: "Delete pipeline stage" },
 
-    // Forms Tools
+    // Forms & Funnels (10 tools)
     { name: "get_forms", description: "Get forms" },
     { name: "create_form", description: "Create a new form" },
     { name: "get_form", description: "Get a specific form" },
     { name: "update_form", description: "Update a form" },
     { name: "delete_form", description: "Delete a form" },
     { name: "get_form_submissions", description: "Get form submissions" },
-
-    // Funnel Tools
     { name: "get_funnels", description: "Get funnels" },
     { name: "create_funnel", description: "Create a new funnel" },
     { name: "get_funnel", description: "Get a specific funnel" },
     { name: "update_funnel", description: "Update a funnel" },
-    { name: "delete_funnel", description: "Delete a funnel" },
-    { name: "get_funnel_pages", description: "Get funnel pages" },
 
-    // Website Tools
-    { name: "get_websites", description: "Get websites" },
-    { name: "create_website", description: "Create a new website" },
-    { name: "get_website", description: "Get a specific website" },
-    { name: "update_website", description: "Update a website" },
-    { name: "delete_website", description: "Delete a website" },
-    { name: "get_website_pages", description: "Get website pages" },
+    // Location & Custom Fields (9 tools)
+    { name: "get_locations", description: "Get all locations" },
+    { name: "get_location", description: "Get a specific location" },
+    { name: "update_location", description: "Update a location" },
+    { name: "get_custom_fields", description: "Get custom fields" },
+    { name: "create_custom_field", description: "Create a custom field" },
+    { name: "get_custom_field", description: "Get a specific custom field" },
+    { name: "update_custom_field", description: "Update a custom field" },
+    { name: "delete_custom_field", description: "Delete a custom field" },
+    { name: "get_tags", description: "Get all tags" },
 
-    // Products Tools
-    { name: "get_products", description: "Get products" },
-    { name: "create_product", description: "Create a new product" },
-    { name: "get_product", description: "Get a specific product" },
-    { name: "update_product", description: "Update a product" },
-    { name: "delete_product", description: "Delete a product" },
-    { name: "get_product_variants", description: "Get product variants" },
+    // Media & Social (10 tools)
+    { name: "upload_media", description: "Upload media file" },
+    { name: "get_media", description: "Get media files" },
+    { name: "delete_media", description: "Delete media file" },
+    { name: "get_social_media_accounts", description: "Get social media accounts" },
+    { name: "connect_social_account", description: "Connect social media account" },
+    { name: "post_to_social", description: "Post to social media" },
+    { name: "schedule_social_post", description: "Schedule social media post" },
+    { name: "get_social_posts", description: "Get social media posts" },
+    { name: "get_integrations", description: "Get integrations" },
+    { name: "connect_integration", description: "Connect integration" },
 
-    // Payment Tools
-    { name: "get_invoices", description: "Get invoices" },
-    { name: "create_invoice", description: "Create a new invoice" },
-    { name: "get_invoice", description: "Get a specific invoice" },
-    { name: "update_invoice", description: "Update an invoice" },
-    { name: "delete_invoice", description: "Delete an invoice" },
-    { name: "send_invoice", description: "Send invoice to customer" },
-    { name: "get_payments", description: "Get payments" },
-    { name: "process_payment", description: "Process a payment" },
-    { name: "refund_payment", description: "Refund a payment" },
-
-    // User Management Tools
-    { name: "get_users", description: "Get users" },
-    { name: "create_user", description: "Create a new user" },
-    { name: "get_user", description: "Get a specific user" },
-    { name: "update_user", description: "Update a user" },
-    { name: "delete_user", description: "Delete a user" },
-    { name: "get_user_permissions", description: "Get user permissions" },
-    { name: "update_user_permissions", description: "Update user permissions" },
-
-    // Analytics Tools
+    // Analytics & Reports (8 tools)
     { name: "get_analytics_overview", description: "Get analytics overview" },
     { name: "get_contact_analytics", description: "Get contact analytics" },
     { name: "get_campaign_analytics", description: "Get campaign analytics" },
     { name: "get_funnel_analytics", description: "Get funnel analytics" },
     { name: "get_revenue_analytics", description: "Get revenue analytics" },
-
-    // SMS Tools
-    { name: "send_sms", description: "Send SMS message" },
-    { name: "get_sms_templates", description: "Get SMS templates" },
-    { name: "create_sms_template", description: "Create SMS template" },
-    { name: "update_sms_template", description: "Update SMS template" },
-    { name: "delete_sms_template", description: "Delete SMS template" },
-
-    // Integration Tools
-    { name: "get_integrations", description: "Get integrations" },
-    { name: "connect_integration", description: "Connect integration" },
-    { name: "disconnect_integration", description: "Disconnect integration" },
-    { name: "sync_integration", description: "Sync integration data" },
-
-    // Tags Tools
-    { name: "get_tags", description: "Get all tags" },
-    { name: "create_tag", description: "Create a new tag" },
-    { name: "update_tag", description: "Update a tag" },
-    { name: "delete_tag", description: "Delete a tag" },
-
-    // Attribution Tools
     { name: "get_attribution_reports", description: "Get attribution reports" },
-    { name: "create_attribution_source", description: "Create attribution source" },
-    { name: "update_attribution_source", description: "Update attribution source" },
+    { name: "get_surveys", description: "Get surveys" },
+    { name: "create_survey", description: "Create a new survey" },
 
-    // Membership Tools
-    { name: "get_memberships", description: "Get memberships" },
-    { name: "create_membership", description: "Create a new membership" },
-    { name: "get_membership", description: "Get a specific membership" },
-    { name: "update_membership", description: "Update a membership" },
-    { name: "cancel_membership", description: "Cancel a membership" }
+    // Users & Payments (8 tools)
+    { name: "get_users", description: "Get users" },
+    { name: "create_user", description: "Create a new user" },
+    { name: "get_user", description: "Get a specific user" },
+    { name: "update_user", description: "Update a user" },
+    { name: "get_invoices", description: "Get invoices" },
+    { name: "create_invoice", description: "Create a new invoice" },
+    { name: "process_payment", description: "Process a payment" },
+    { name: "get_payments", description: "Get payments" }
   ];
 
   // Add input schemas for core tools
