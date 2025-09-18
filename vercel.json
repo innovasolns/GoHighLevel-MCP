@@ -1,12 +1,44 @@
 {
   "version": 2,
-  "builds": [
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 60
+    }
+  },
+  "buildCommand": "",
+  "outputDirectory": null,
+  "installCommand": "npm install",
+  "rewrites": [
     {
-      "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "source": "/health",
+      "destination": "/api"
+    },
+    {
+      "source": "/sse",
+      "destination": "/api"
+    },
+    {
+      "source": "/",
+      "destination": "/api"
     }
   ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/index.js" }
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Accept, Authorization"
+        }
+      ]
+    }
   ]
-} 
+}

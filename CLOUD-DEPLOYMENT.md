@@ -73,7 +73,7 @@ To connect your GoHighLevel MCP Server to ChatGPT, you need to deploy it to a **
 
 ### **Deploy with One Click:**
 
-1. **Click Deploy Button:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/your-username/ghl-mcp-server)
+1. **Click Deploy Button:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/innovasolns/GoHighLevel-MCP)
 
 2. **Add Environment Variables** during setup
 
