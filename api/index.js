@@ -41,10 +41,6 @@ async function initializeTools() {
     { name: "add_contact_tag", description: "Add tag to contact" },
     { name: "remove_contact_tag", description: "Remove tag from contact" },
     { name: "get_contact_tags", description: "Get all tags for a contact" },
-    { name: "get_contact_notes", description: "Get notes for a contact" },
-    { name: "create_contact_note", description: "Create a note for a contact" },
-    { name: "update_contact_note", description: "Update a contact note" },
-    { name: "delete_contact_note", description: "Delete a contact note" },
     { name: "get_contact_tasks", description: "Get tasks for a contact" },
     { name: "create_contact_task", description: "Create a task for a contact" },
     { name: "update_contact_task", description: "Update a contact task" },
@@ -174,15 +170,20 @@ async function initializeTools() {
     { name: "get_surveys", description: "Get surveys" },
     { name: "create_survey", description: "Create a new survey" },
 
-    // Users & Payments (8 tools)
+    // Blog Tools (7 tools)
+    { name: "get_blogs", description: "Get blog posts" },
+    { name: "create_blog", description: "Create a new blog post" },
+    { name: "get_blog", description: "Get a specific blog post" },
+    { name: "update_blog", description: "Update a blog post" },
+    { name: "delete_blog", description: "Delete a blog post" },
+    { name: "publish_blog", description: "Publish a blog post" },
+    { name: "unpublish_blog", description: "Unpublish a blog post" },
+
+    // Users (4 tools)
     { name: "get_users", description: "Get users" },
     { name: "create_user", description: "Create a new user" },
     { name: "get_user", description: "Get a specific user" },
-    { name: "update_user", description: "Update a user" },
-    { name: "get_invoices", description: "Get invoices" },
-    { name: "create_invoice", description: "Create a new invoice" },
-    { name: "process_payment", description: "Process a payment" },
-    { name: "get_payments", description: "Get payments" }
+    { name: "update_user", description: "Update a user" }
   ];
 
   // Add input schemas for core tools
@@ -379,6 +380,67 @@ async function callGoHighLevelAPI(toolName, args) {
       const workflowResponse = await fetch(workflowUrl, { headers });
       const workflowData = await workflowResponse.json();
       return `Found workflows: ${JSON.stringify(workflowData, null, 2)}`;
+
+    // Blog Tools
+    case 'get_blogs':
+      const blogsUrl = `${baseUrl}/blogs/?locationId=${locationId}&limit=${args.limit || 20}`;
+      const blogsResponse = await fetch(blogsUrl, { headers });
+      const blogsData = await blogsResponse.json();
+      return `Found ${blogsData.blogs?.length || 0} blog posts: ${JSON.stringify(blogsData, null, 2)}`;
+
+    case 'create_blog':
+      const createBlogUrl = `${baseUrl}/blogs/`;
+      const createBlogResponse = await fetch(createBlogUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ ...args, locationId })
+      });
+      const createBlogData = await createBlogResponse.json();
+      return `Blog post created successfully: ${JSON.stringify(createBlogData, null, 2)}`;
+
+    case 'get_blog':
+      const getBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
+      const getBlogResponse = await fetch(getBlogUrl, { headers });
+      const getBlogData = await getBlogResponse.json();
+      return `Blog post details: ${JSON.stringify(getBlogData, null, 2)}`;
+
+    case 'update_blog':
+      const updateBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
+      const { blogId, ...updateBlogData } = args;
+      const updateBlogResponse = await fetch(updateBlogUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(updateBlogData)
+      });
+      const updateBlogResult = await updateBlogResponse.json();
+      return `Blog post updated successfully: ${JSON.stringify(updateBlogResult, null, 2)}`;
+
+    case 'delete_blog':
+      const deleteBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
+      const deleteBlogResponse = await fetch(deleteBlogUrl, {
+        method: 'DELETE',
+        headers
+      });
+      const deleteBlogResult = await deleteBlogResponse.json();
+      return `Blog post deleted successfully: ${JSON.stringify(deleteBlogResult, null, 2)}`;
+
+    case 'publish_blog':
+      const publishBlogUrl = `${baseUrl}/blogs/${args.blogId}/publish`;
+      const publishBlogResponse = await fetch(publishBlogUrl, {
+        method: 'POST',
+        headers
+      });
+      const publishBlogResult = await publishBlogResponse.json();
+      return `Blog post published successfully: ${JSON.stringify(publishBlogResult, null, 2)}`;
+
+    case 'unpublish_blog':
+      const unpublishBlogUrl = `${baseUrl}/blogs/${args.blogId}/unpublish`;
+      const unpublishBlogResponse = await fetch(unpublishBlogUrl, {
+        method: 'POST',
+        headers
+      });
+      const unpublishBlogResult = await unpublishBlogResponse.json();
+      return `Blog post unpublished successfully: ${JSON.stringify(unpublishBlogResult, null, 2)}`;
 
     // Default handler for all other tools
     default:
