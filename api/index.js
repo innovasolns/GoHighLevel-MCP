@@ -171,13 +171,13 @@ async function initializeTools() {
     { name: "create_survey", description: "Create a new survey" },
 
     // Blog Tools (7 tools)
-    { name: "get_blogs", description: "Get blog posts" },
-    { name: "create_blog", description: "Create a new blog post" },
-    { name: "get_blog", description: "Get a specific blog post" },
-    { name: "update_blog", description: "Update a blog post" },
-    { name: "delete_blog", description: "Delete a blog post" },
-    { name: "publish_blog", description: "Publish a blog post" },
-    { name: "unpublish_blog", description: "Unpublish a blog post" },
+    { name: "get_blog_posts", description: "Get blog posts from a specific blog site" },
+    { name: "create_blog_post", description: "Create a new blog post" },
+    { name: "update_blog_post", description: "Update an existing blog post" },
+    { name: "get_blog_sites", description: "Get all blog sites for the location" },
+    { name: "get_blog_authors", description: "Get available blog authors" },
+    { name: "get_blog_categories", description: "Get available blog categories" },
+    { name: "check_url_slug", description: "Check if a URL slug is available" },
 
     // Users (4 tools)
     { name: "get_users", description: "Get users" },
@@ -381,66 +381,61 @@ async function callGoHighLevelAPI(toolName, args) {
       const workflowData = await workflowResponse.json();
       return `Found workflows: ${JSON.stringify(workflowData, null, 2)}`;
 
-    // Blog Tools
-    case 'get_blogs':
-      const blogsUrl = `${baseUrl}/blogs/?locationId=${locationId}&limit=${args.limit || 20}`;
-      const blogsResponse = await fetch(blogsUrl, { headers });
-      const blogsData = await blogsResponse.json();
-      return `Found ${blogsData.blogs?.length || 0} blog posts: ${JSON.stringify(blogsData, null, 2)}`;
+    // Blog Tools - Using correct GoHighLevel API endpoints
+    case 'get_blog_sites':
+      const blogSitesUrl = `${baseUrl}/blogs/site/all?locationId=${locationId}&limit=${args.limit || 10}&skip=${args.skip || 0}`;
+      const blogSitesResponse = await fetch(blogSitesUrl, { headers });
+      const blogSitesData = await blogSitesResponse.json();
+      return `Found ${blogSitesData.data?.length || 0} blog sites: ${JSON.stringify(blogSitesData, null, 2)}`;
 
-    case 'create_blog':
-      const createBlogUrl = `${baseUrl}/blogs/`;
-      const createBlogResponse = await fetch(createBlogUrl, {
+    case 'get_blog_posts':
+      const blogPostsUrl = `${baseUrl}/blogs/posts/all?locationId=${locationId}&blogId=${args.blogId}&limit=${args.limit || 10}&offset=${args.offset || 0}`;
+      const blogPostsResponse = await fetch(blogPostsUrl, { headers });
+      const blogPostsData = await blogPostsResponse.json();
+      return `Found ${blogPostsData.blogs?.length || 0} blog posts: ${JSON.stringify(blogPostsData, null, 2)}`;
+
+    case 'create_blog_post':
+      const createBlogPostUrl = `${baseUrl}/blogs/posts`;
+      const createBlogPostResponse = await fetch(createBlogPostUrl, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ ...args, locationId })
+        body: JSON.stringify({
+          ...args,
+          locationId,
+          publishedAt: args.publishedAt || new Date().toISOString()
+        })
       });
-      const createBlogData = await createBlogResponse.json();
-      return `Blog post created successfully: ${JSON.stringify(createBlogData, null, 2)}`;
+      const createBlogPostData = await createBlogPostResponse.json();
+      return `Blog post created successfully: ${JSON.stringify(createBlogPostData, null, 2)}`;
 
-    case 'get_blog':
-      const getBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
-      const getBlogResponse = await fetch(getBlogUrl, { headers });
-      const getBlogData = await getBlogResponse.json();
-      return `Blog post details: ${JSON.stringify(getBlogData, null, 2)}`;
-
-    case 'update_blog':
-      const updateBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
-      const { blogId, ...updateBlogData } = args;
-      const updateBlogResponse = await fetch(updateBlogUrl, {
+    case 'update_blog_post':
+      const updateBlogPostUrl = `${baseUrl}/blogs/posts/${args.postId}`;
+      const { postId, ...updateBlogPostData } = args;
+      const updateBlogPostResponse = await fetch(updateBlogPostUrl, {
         method: 'PUT',
         headers,
-        body: JSON.stringify(updateBlogData)
+        body: JSON.stringify({ ...updateBlogPostData, locationId })
       });
-      const updateBlogResult = await updateBlogResponse.json();
-      return `Blog post updated successfully: ${JSON.stringify(updateBlogResult, null, 2)}`;
+      const updateBlogPostResult = await updateBlogPostResponse.json();
+      return `Blog post updated successfully: ${JSON.stringify(updateBlogPostResult, null, 2)}`;
 
-    case 'delete_blog':
-      const deleteBlogUrl = `${baseUrl}/blogs/${args.blogId}`;
-      const deleteBlogResponse = await fetch(deleteBlogUrl, {
-        method: 'DELETE',
-        headers
-      });
-      const deleteBlogResult = await deleteBlogResponse.json();
-      return `Blog post deleted successfully: ${JSON.stringify(deleteBlogResult, null, 2)}`;
+    case 'get_blog_authors':
+      const blogAuthorsUrl = `${baseUrl}/blogs/authors?locationId=${locationId}&limit=${args.limit || 10}&offset=${args.offset || 0}`;
+      const blogAuthorsResponse = await fetch(blogAuthorsUrl, { headers });
+      const blogAuthorsData = await blogAuthorsResponse.json();
+      return `Found ${blogAuthorsData.authors?.length || 0} blog authors: ${JSON.stringify(blogAuthorsData, null, 2)}`;
 
-    case 'publish_blog':
-      const publishBlogUrl = `${baseUrl}/blogs/${args.blogId}/publish`;
-      const publishBlogResponse = await fetch(publishBlogUrl, {
-        method: 'POST',
-        headers
-      });
-      const publishBlogResult = await publishBlogResponse.json();
-      return `Blog post published successfully: ${JSON.stringify(publishBlogResult, null, 2)}`;
+    case 'get_blog_categories':
+      const blogCategoriesUrl = `${baseUrl}/blogs/categories?locationId=${locationId}&limit=${args.limit || 10}&offset=${args.offset || 0}`;
+      const blogCategoriesResponse = await fetch(blogCategoriesUrl, { headers });
+      const blogCategoriesData = await blogCategoriesResponse.json();
+      return `Found ${blogCategoriesData.categories?.length || 0} blog categories: ${JSON.stringify(blogCategoriesData, null, 2)}`;
 
-    case 'unpublish_blog':
-      const unpublishBlogUrl = `${baseUrl}/blogs/${args.blogId}/unpublish`;
-      const unpublishBlogResponse = await fetch(unpublishBlogUrl, {
-        method: 'POST',
-        headers
-      });
-      const unpublishBlogResult = await unpublishBlogResponse.json();
-      return `Blog post unpublished successfully: ${JSON.stringify(unpublishBlogResult, null, 2)}`;
+    case 'check_url_slug':
+      const checkSlugUrl = `${baseUrl}/blogs/slug/check?locationId=${locationId}&urlSlug=${encodeURIComponent(args.urlSlug)}${args.postId ? `&postId=${args.postId}` : ''}`;
+      const checkSlugResponse = await fetch(checkSlugUrl, { headers });
+      const checkSlugData = await checkSlugResponse.json();
+      return `URL slug check result: ${JSON.stringify(checkSlugData, null, 2)}`;
 
     // Default handler for all other tools
     default:
