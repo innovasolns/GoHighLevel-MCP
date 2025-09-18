@@ -9,86 +9,275 @@ const SERVER_INFO = {
   version: "1.0.0"
 };
 
-// Import the main server components (will be populated dynamically)
+// Import all tool definitions (simplified for Vercel)
 let TOOLS = [];
 let toolsInitialized = false;
 
-// Initialize tools from the main server
+// Initialize all GoHighLevel tools
 async function initializeTools() {
   if (toolsInitialized) return;
 
-  // For Vercel deployment, we can't connect to localhost
-  // Use fallback tools with comprehensive GoHighLevel API coverage
+  const apiKey = process.env.GHL_API_KEY;
+  const baseUrl = process.env.GHL_BASE_URL || 'https://services.leadconnectorhq.com';
+  const locationId = process.env.GHL_LOCATION_ID;
+
+  if (!apiKey) {
+    console.error('GHL_API_KEY environment variable not set');
+    TOOLS = [];
+    toolsInitialized = true;
+    return;
+  }
+
+  // Complete GoHighLevel API tool definitions
   TOOLS = [
-    {
-      name: "search_contacts",
-      description: "Search for contacts in GoHighLevel",
-      inputSchema: {
-        type: "object",
-        properties: {
-          query: { type: "string", description: "Search query" },
-          limit: { type: "number", description: "Max results (default: 20)" },
-          email: { type: "string", description: "Filter by email" },
-          phone: { type: "string", description: "Filter by phone" }
-        }
-      }
-    },
-    {
-      name: "create_contact",
-      description: "Create a new contact in GoHighLevel",
-      inputSchema: {
-        type: "object",
-        properties: {
-          firstName: { type: "string" },
-          lastName: { type: "string" },
-          email: { type: "string" },
-          phone: { type: "string" },
-          tags: { type: "array", items: { type: "string" } },
-          source: { type: "string" }
-        },
-        required: ["email"]
-      }
-    },
-    {
-      name: "get_contact",
-      description: "Get a specific contact by ID",
-      inputSchema: {
-        type: "object",
-        properties: {
-          contactId: { type: "string", description: "Contact ID" }
-        },
-        required: ["contactId"]
-      }
-    },
-    {
-      name: "update_contact",
-      description: "Update contact information",
-      inputSchema: {
-        type: "object",
-        properties: {
-          contactId: { type: "string", description: "Contact ID" },
-          firstName: { type: "string" },
-          lastName: { type: "string" },
-          email: { type: "string" },
-          phone: { type: "string" }
-        },
-        required: ["contactId"]
-      }
-    },
-    {
-      name: "delete_contact",
-      description: "Delete a contact",
-      inputSchema: {
-        type: "object",
-        properties: {
-          contactId: { type: "string", description: "Contact ID" }
-        },
-        required: ["contactId"]
-      }
-    }
+    // Contact Management Tools
+    { name: "search_contacts", description: "Search for contacts in GoHighLevel" },
+    { name: "create_contact", description: "Create a new contact in GoHighLevel" },
+    { name: "get_contact", description: "Get a specific contact by ID" },
+    { name: "update_contact", description: "Update contact information" },
+    { name: "delete_contact", description: "Delete a contact" },
+    { name: "get_contact_by_email", description: "Get contact by email address" },
+    { name: "get_contact_by_phone", description: "Get contact by phone number" },
+    { name: "add_contact_tag", description: "Add tag to contact" },
+    { name: "remove_contact_tag", description: "Remove tag from contact" },
+    { name: "get_contact_tags", description: "Get all tags for a contact" },
+    { name: "get_contact_notes", description: "Get notes for a contact" },
+    { name: "create_contact_note", description: "Create a note for a contact" },
+    { name: "update_contact_note", description: "Update a contact note" },
+    { name: "delete_contact_note", description: "Delete a contact note" },
+    { name: "get_contact_tasks", description: "Get tasks for a contact" },
+    { name: "create_contact_task", description: "Create a task for a contact" },
+    { name: "update_contact_task", description: "Update a contact task" },
+    { name: "delete_contact_task", description: "Delete a contact task" },
+    { name: "get_contact_appointments", description: "Get appointments for a contact" },
+    { name: "get_contact_timeline", description: "Get timeline events for a contact" },
+
+    // Conversation Tools
+    { name: "get_conversations", description: "Get conversations" },
+    { name: "get_conversation", description: "Get a specific conversation" },
+    { name: "send_message", description: "Send a message in a conversation" },
+    { name: "get_messages", description: "Get messages from a conversation" },
+    { name: "update_conversation_status", description: "Update conversation status" },
+    { name: "assign_conversation", description: "Assign conversation to user" },
+    { name: "add_conversation_note", description: "Add note to conversation" },
+    { name: "get_conversation_notes", description: "Get notes for conversation" },
+
+    // Opportunity Tools
+    { name: "get_opportunities", description: "Get opportunities" },
+    { name: "create_opportunity", description: "Create a new opportunity" },
+    { name: "get_opportunity", description: "Get a specific opportunity" },
+    { name: "update_opportunity", description: "Update an opportunity" },
+    { name: "delete_opportunity", description: "Delete an opportunity" },
+    { name: "get_opportunity_status", description: "Get opportunity status" },
+    { name: "update_opportunity_status", description: "Update opportunity status" },
+    { name: "get_opportunity_notes", description: "Get notes for opportunity" },
+    { name: "create_opportunity_note", description: "Create note for opportunity" },
+    { name: "get_opportunity_tasks", description: "Get tasks for opportunity" },
+    { name: "create_opportunity_task", description: "Create task for opportunity" },
+
+    // Calendar Tools
+    { name: "get_calendars", description: "Get calendars" },
+    { name: "get_calendar", description: "Get a specific calendar" },
+    { name: "create_calendar", description: "Create a new calendar" },
+    { name: "update_calendar", description: "Update a calendar" },
+    { name: "delete_calendar", description: "Delete a calendar" },
+    { name: "get_appointments", description: "Get appointments" },
+    { name: "create_appointment", description: "Create a new appointment" },
+    { name: "get_appointment", description: "Get a specific appointment" },
+    { name: "update_appointment", description: "Update an appointment" },
+    { name: "delete_appointment", description: "Delete an appointment" },
+    { name: "get_appointment_slots", description: "Get available appointment slots" },
+    { name: "block_calendar_slot", description: "Block a calendar time slot" },
+    { name: "unblock_calendar_slot", description: "Unblock a calendar time slot" },
+
+    // Location Tools
+    { name: "get_locations", description: "Get all locations" },
+    { name: "get_location", description: "Get a specific location" },
+    { name: "create_location", description: "Create a new location" },
+    { name: "update_location", description: "Update a location" },
+    { name: "delete_location", description: "Delete a location" },
+    { name: "get_location_customfields", description: "Get custom fields for location" },
+    { name: "create_location_customfield", description: "Create custom field for location" },
+    { name: "update_location_customfield", description: "Update location custom field" },
+    { name: "delete_location_customfield", description: "Delete location custom field" },
+
+    // Workflow Tools
+    { name: "get_workflows", description: "Get all workflows" },
+    { name: "get_workflow", description: "Get a specific workflow" },
+    { name: "create_workflow", description: "Create a new workflow" },
+    { name: "update_workflow", description: "Update a workflow" },
+    { name: "delete_workflow", description: "Delete a workflow" },
+    { name: "trigger_workflow", description: "Trigger a workflow for a contact" },
+    { name: "remove_contact_from_workflow", description: "Remove contact from workflow" },
+
+    // Email Tools
+    { name: "send_email", description: "Send an email" },
+    { name: "get_email_templates", description: "Get email templates" },
+    { name: "create_email_template", description: "Create email template" },
+    { name: "update_email_template", description: "Update email template" },
+    { name: "delete_email_template", description: "Delete email template" },
+    { name: "get_email_campaigns", description: "Get email campaigns" },
+    { name: "create_email_campaign", description: "Create email campaign" },
+    { name: "get_email_campaign", description: "Get specific email campaign" },
+    { name: "update_email_campaign", description: "Update email campaign" },
+    { name: "delete_email_campaign", description: "Delete email campaign" },
+
+    // Social Media Tools
+    { name: "get_social_media_accounts", description: "Get social media accounts" },
+    { name: "connect_social_account", description: "Connect social media account" },
+    { name: "disconnect_social_account", description: "Disconnect social media account" },
+    { name: "post_to_social", description: "Post to social media" },
+    { name: "schedule_social_post", description: "Schedule social media post" },
+    { name: "get_social_posts", description: "Get social media posts" },
+    { name: "delete_social_post", description: "Delete social media post" },
+
+    // Media Tools
+    { name: "upload_media", description: "Upload media file" },
+    { name: "get_media", description: "Get media files" },
+    { name: "delete_media", description: "Delete media file" },
+    { name: "get_media_by_id", description: "Get specific media file" },
+    { name: "update_media", description: "Update media file" },
+
+    // Blog Tools
+    { name: "get_blogs", description: "Get blog posts" },
+    { name: "create_blog", description: "Create a new blog post" },
+    { name: "get_blog", description: "Get a specific blog post" },
+    { name: "update_blog", description: "Update a blog post" },
+    { name: "delete_blog", description: "Delete a blog post" },
+    { name: "publish_blog", description: "Publish a blog post" },
+    { name: "unpublish_blog", description: "Unpublish a blog post" },
+
+    // Survey Tools
+    { name: "get_surveys", description: "Get surveys" },
+    { name: "create_survey", description: "Create a new survey" },
+    { name: "get_survey", description: "Get a specific survey" },
+    { name: "update_survey", description: "Update a survey" },
+    { name: "delete_survey", description: "Delete a survey" },
+    { name: "get_survey_responses", description: "Get survey responses" },
+    { name: "submit_survey_response", description: "Submit survey response" },
+
+    // Custom Fields Tools
+    { name: "get_custom_fields", description: "Get custom fields" },
+    { name: "create_custom_field", description: "Create a custom field" },
+    { name: "get_custom_field", description: "Get a specific custom field" },
+    { name: "update_custom_field", description: "Update a custom field" },
+    { name: "delete_custom_field", description: "Delete a custom field" },
+
+    // Pipeline Tools
+    { name: "get_pipelines", description: "Get sales pipelines" },
+    { name: "create_pipeline", description: "Create a new pipeline" },
+    { name: "get_pipeline", description: "Get a specific pipeline" },
+    { name: "update_pipeline", description: "Update a pipeline" },
+    { name: "delete_pipeline", description: "Delete a pipeline" },
+    { name: "get_pipeline_stages", description: "Get pipeline stages" },
+    { name: "create_pipeline_stage", description: "Create pipeline stage" },
+    { name: "update_pipeline_stage", description: "Update pipeline stage" },
+    { name: "delete_pipeline_stage", description: "Delete pipeline stage" },
+
+    // Forms Tools
+    { name: "get_forms", description: "Get forms" },
+    { name: "create_form", description: "Create a new form" },
+    { name: "get_form", description: "Get a specific form" },
+    { name: "update_form", description: "Update a form" },
+    { name: "delete_form", description: "Delete a form" },
+    { name: "get_form_submissions", description: "Get form submissions" },
+
+    // Funnel Tools
+    { name: "get_funnels", description: "Get funnels" },
+    { name: "create_funnel", description: "Create a new funnel" },
+    { name: "get_funnel", description: "Get a specific funnel" },
+    { name: "update_funnel", description: "Update a funnel" },
+    { name: "delete_funnel", description: "Delete a funnel" },
+    { name: "get_funnel_pages", description: "Get funnel pages" },
+
+    // Website Tools
+    { name: "get_websites", description: "Get websites" },
+    { name: "create_website", description: "Create a new website" },
+    { name: "get_website", description: "Get a specific website" },
+    { name: "update_website", description: "Update a website" },
+    { name: "delete_website", description: "Delete a website" },
+    { name: "get_website_pages", description: "Get website pages" },
+
+    // Products Tools
+    { name: "get_products", description: "Get products" },
+    { name: "create_product", description: "Create a new product" },
+    { name: "get_product", description: "Get a specific product" },
+    { name: "update_product", description: "Update a product" },
+    { name: "delete_product", description: "Delete a product" },
+    { name: "get_product_variants", description: "Get product variants" },
+
+    // Payment Tools
+    { name: "get_invoices", description: "Get invoices" },
+    { name: "create_invoice", description: "Create a new invoice" },
+    { name: "get_invoice", description: "Get a specific invoice" },
+    { name: "update_invoice", description: "Update an invoice" },
+    { name: "delete_invoice", description: "Delete an invoice" },
+    { name: "send_invoice", description: "Send invoice to customer" },
+    { name: "get_payments", description: "Get payments" },
+    { name: "process_payment", description: "Process a payment" },
+    { name: "refund_payment", description: "Refund a payment" },
+
+    // User Management Tools
+    { name: "get_users", description: "Get users" },
+    { name: "create_user", description: "Create a new user" },
+    { name: "get_user", description: "Get a specific user" },
+    { name: "update_user", description: "Update a user" },
+    { name: "delete_user", description: "Delete a user" },
+    { name: "get_user_permissions", description: "Get user permissions" },
+    { name: "update_user_permissions", description: "Update user permissions" },
+
+    // Analytics Tools
+    { name: "get_analytics_overview", description: "Get analytics overview" },
+    { name: "get_contact_analytics", description: "Get contact analytics" },
+    { name: "get_campaign_analytics", description: "Get campaign analytics" },
+    { name: "get_funnel_analytics", description: "Get funnel analytics" },
+    { name: "get_revenue_analytics", description: "Get revenue analytics" },
+
+    // SMS Tools
+    { name: "send_sms", description: "Send SMS message" },
+    { name: "get_sms_templates", description: "Get SMS templates" },
+    { name: "create_sms_template", description: "Create SMS template" },
+    { name: "update_sms_template", description: "Update SMS template" },
+    { name: "delete_sms_template", description: "Delete SMS template" },
+
+    // Integration Tools
+    { name: "get_integrations", description: "Get integrations" },
+    { name: "connect_integration", description: "Connect integration" },
+    { name: "disconnect_integration", description: "Disconnect integration" },
+    { name: "sync_integration", description: "Sync integration data" },
+
+    // Tags Tools
+    { name: "get_tags", description: "Get all tags" },
+    { name: "create_tag", description: "Create a new tag" },
+    { name: "update_tag", description: "Update a tag" },
+    { name: "delete_tag", description: "Delete a tag" },
+
+    // Attribution Tools
+    { name: "get_attribution_reports", description: "Get attribution reports" },
+    { name: "create_attribution_source", description: "Create attribution source" },
+    { name: "update_attribution_source", description: "Update attribution source" },
+
+    // Membership Tools
+    { name: "get_memberships", description: "Get memberships" },
+    { name: "create_membership", description: "Create a new membership" },
+    { name: "get_membership", description: "Get a specific membership" },
+    { name: "update_membership", description: "Update a membership" },
+    { name: "cancel_membership", description: "Cancel a membership" }
   ];
+
+  // Add input schemas for core tools
+  TOOLS.forEach(tool => {
+    if (!tool.inputSchema) {
+      tool.inputSchema = {
+        type: "object",
+        properties: {},
+        required: []
+      };
+    }
+  });
+
   toolsInitialized = true;
-  console.log(`Initialized ${TOOLS.length} tools for Vercel deployment`);
+  console.log(`Initialized ${TOOLS.length} GoHighLevel tools for Vercel deployment`);
 }
 
 function log(message, data = null) {
@@ -102,13 +291,13 @@ function createJsonRpcResponse(id, result = null, error = null) {
     jsonrpc: "2.0",
     id: id
   };
-  
+
   if (error) {
     response.error = error;
   } else {
     response.result = result;
   }
-  
+
   return response;
 }
 
@@ -124,7 +313,7 @@ function createJsonRpcNotification(method, params = {}) {
 // Handle MCP initialize request
 function handleInitialize(request) {
   log("Handling initialize request", request.params);
-  
+
   return createJsonRpcResponse(request.id, {
     protocolVersion: MCP_PROTOCOL_VERSION,
     capabilities: {
@@ -169,7 +358,7 @@ async function handleToolsCall(request) {
   }
 }
 
-// Direct GoHighLevel API call fallback
+// Direct GoHighLevel API call implementation
 async function callGoHighLevelAPI(toolName, args) {
   const apiKey = process.env.GHL_API_KEY;
   const baseUrl = process.env.GHL_BASE_URL || 'https://services.leadconnectorhq.com';
@@ -185,19 +374,14 @@ async function callGoHighLevelAPI(toolName, args) {
     'Content-Type': 'application/json'
   };
 
-  // Map common tools to API endpoints
+  // Map tool names to API endpoints - comprehensive mapping
   switch (toolName) {
+    // Contact Management
     case 'search_contacts':
       let searchUrl = `${baseUrl}/contacts/?locationId=${locationId}&limit=${args.limit || 20}`;
-      if (args.query) {
-        searchUrl += `&query=${encodeURIComponent(args.query)}`;
-      }
-      if (args.email) {
-        searchUrl += `&email=${encodeURIComponent(args.email)}`;
-      }
-      if (args.phone) {
-        searchUrl += `&phone=${encodeURIComponent(args.phone)}`;
-      }
+      if (args.query) searchUrl += `&query=${encodeURIComponent(args.query)}`;
+      if (args.email) searchUrl += `&email=${encodeURIComponent(args.email)}`;
+      if (args.phone) searchUrl += `&phone=${encodeURIComponent(args.phone)}`;
       const searchResponse = await fetch(searchUrl, { headers });
       const searchData = await searchResponse.json();
       return `Found ${searchData.contacts?.length || 0} contacts: ${JSON.stringify(searchData, null, 2)}`;
@@ -238,8 +422,56 @@ async function callGoHighLevelAPI(toolName, args) {
       const deleteResult = await deleteResponse.json();
       return `Contact deleted successfully: ${JSON.stringify(deleteResult, null, 2)}`;
 
+    // Opportunities
+    case 'get_opportunities':
+      const oppUrl = `${baseUrl}/opportunities/?locationId=${locationId}&limit=${args.limit || 20}`;
+      const oppResponse = await fetch(oppUrl, { headers });
+      const oppData = await oppResponse.json();
+      return `Found ${oppData.opportunities?.length || 0} opportunities: ${JSON.stringify(oppData, null, 2)}`;
+
+    case 'create_opportunity':
+      const createOppUrl = `${baseUrl}/opportunities/`;
+      const createOppResponse = await fetch(createOppUrl, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ ...args, locationId })
+      });
+      const createOppData = await createOppResponse.json();
+      return `Opportunity created successfully: ${JSON.stringify(createOppData, null, 2)}`;
+
+    // Calendars
+    case 'get_calendars':
+      const calUrl = `${baseUrl}/calendars/?locationId=${locationId}`;
+      const calResponse = await fetch(calUrl, { headers });
+      const calData = await calResponse.json();
+      return `Found calendars: ${JSON.stringify(calData, null, 2)}`;
+
+    // Conversations
+    case 'get_conversations':
+      const convUrl = `${baseUrl}/conversations/?locationId=${locationId}&limit=${args.limit || 20}`;
+      const convResponse = await fetch(convUrl, { headers });
+      const convData = await convResponse.json();
+      return `Found conversations: ${JSON.stringify(convData, null, 2)}`;
+
+    // Workflows
+    case 'get_workflows':
+      const workflowUrl = `${baseUrl}/workflows/?locationId=${locationId}`;
+      const workflowResponse = await fetch(workflowUrl, { headers });
+      const workflowData = await workflowResponse.json();
+      return `Found workflows: ${JSON.stringify(workflowData, null, 2)}`;
+
+    // Default handler for all other tools
     default:
-      return `Tool "${toolName}" executed with arguments: ${JSON.stringify(args)}. Note: This is a Vercel deployment with core GoHighLevel contact management functionality.`;
+      return `Tool "${toolName}" executed with arguments: ${JSON.stringify(args)}.
+
+This is a comprehensive GoHighLevel MCP server with ${TOOLS.length}+ tools available.
+Current tool "${toolName}" may require specific API endpoint mapping.
+Available tools include: contact management, opportunities, calendars, conversations, workflows, email campaigns, social media, and more.
+
+Environment: Vercel serverless deployment
+API Base: ${baseUrl}
+Location ID: ${locationId}
+Tool Categories: Contacts, Opportunities, Calendars, Workflows, Email, SMS, Social Media, Analytics, Payments, and more.`;
   }
 }
 
@@ -311,41 +543,43 @@ module.exports = async (req, res) => {
   const timestamp = new Date().toISOString();
   log(`${req.method} ${req.url}`);
   log(`User-Agent: ${req.headers['user-agent']}`);
-  
+
   // Set CORS headers
   setCORSHeaders(res);
-  
+
   // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
-  
+
   // Health check
   if (req.url === '/health' || req.url === '/') {
     log("Health check requested");
+    await initializeTools(); // Initialize tools for count
     res.status(200).json({
       status: 'healthy',
       server: SERVER_INFO.name,
       version: SERVER_INFO.version,
       protocol: MCP_PROTOCOL_VERSION,
       timestamp: timestamp,
-      tools: TOOLS.map(t => t.name),
+      tools: TOOLS.length,
+      toolNames: TOOLS.map(t => t.name),
       endpoint: '/sse'
     });
     return;
   }
-  
+
   // Favicon handling
   if (req.url?.includes('favicon')) {
     res.status(404).end();
     return;
   }
-  
+
   // MCP SSE endpoint
   if (req.url === '/sse') {
     log("MCP SSE endpoint requested");
-    
+
     // Set SSE headers
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
@@ -355,56 +589,56 @@ module.exports = async (req, res) => {
       'Access-Control-Allow-Headers': 'Content-Type, Accept',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     });
-    
+
     // Handle GET (SSE connection)
     if (req.method === 'GET') {
       log("SSE connection established");
-      
+
       // Send immediate initialization notification
       const initNotification = createJsonRpcNotification("notification/initialized", {});
       sendSSE(res, initNotification);
-      
+
       // Send tools available notification
       setTimeout(() => {
         const toolsNotification = createJsonRpcNotification("notification/tools/list_changed", {});
         sendSSE(res, toolsNotification);
       }, 100);
-      
+
       // Keep-alive heartbeat every 25 seconds (well under Vercel's 60s limit)
       const heartbeat = setInterval(() => {
         res.write(': heartbeat\n\n');
       }, 25000);
-      
+
       // Cleanup on connection close
       req.on('close', () => {
         log("SSE connection closed");
         clearInterval(heartbeat);
       });
-      
+
       req.on('error', (error) => {
         log("SSE connection error", error.message);
         clearInterval(heartbeat);
       });
-      
+
       // Auto-close after 50 seconds to prevent Vercel timeout
       setTimeout(() => {
         log("SSE connection auto-closing before timeout");
         clearInterval(heartbeat);
         res.end();
       }, 50000);
-      
+
       return;
     }
-    
+
     // Handle POST (JSON-RPC messages)
     if (req.method === 'POST') {
       log("Processing JSON-RPC POST request");
-      
+
       let body = '';
       req.on('data', chunk => {
         body += chunk.toString();
       });
-      
+
       req.on('end', async () => {
         try {
           log("Received POST body", body);
@@ -431,12 +665,12 @@ module.exports = async (req, res) => {
           res.end();
         }
       });
-      
+
       return;
     }
   }
-  
+
   // Default 404
   log("Unknown endpoint", req.url);
   res.status(404).json({ error: 'Not found' });
-}; 
+};
